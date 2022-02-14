@@ -14,7 +14,7 @@ const mainMenuQuestion = [
   {type: 'list',
   name: 'startQuestion',
   message: 'What would you like to do?',
-  choices: ['View Departments','View Roles', 'View Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update a Role']
+  choices: ['View Departments','View Roles', 'View Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update an Employee Role']
    }];
 
 // Express middleware
@@ -96,7 +96,7 @@ addDepartment = async function () {
                 }
                 return console.log("Department saved");
               });
-})
+            })
 };
 
 addRole = async function () {
@@ -226,7 +226,7 @@ addEmployee = async function () {
      }
   ];    
 
-  return inquirer.prompt(questions)
+  inquirer.prompt(questions)
     .then((answers) => {
       let managerNumber
       if (answers.employeeManager === 'None') {
@@ -248,6 +248,67 @@ addEmployee = async function () {
               });
 })
 };
+
+updateRole = async function () {
+
+let currentEmployees = [];
+let currentRoles = [];
+
+getList = function (){ db.execute(`SELECT * FROM employees`, (err, rows) => {
+      
+    for (let i = 0; i < rows.length; i++) {
+    let thisEmployee = `${rows[i].id}. ${rows[i].first_name} ${rows[i].last_name}`;
+    currentEmployees.push(thisEmployee);
+    return currentEmployees;
+    };
+  });
+
+  db.execute(`SELECT * FROM roles`, (err, rows) => {
+      
+    for (let i = 0; i < rows.length; i++) {
+    let thisRole = `${rows[i].id}. ${rows[i].title}`;
+    currentRoles.push(thisRole);
+    return currentRoles;
+    };
+  });};
+
+const promise = getList ();
+
+ const questions = [{
+    type: 'list',
+    name: 'whichEmployee',
+    message: 'Which employee is changing roles??',
+    choices: currentEmployees
+   },
+   {
+    type: 'list',
+    name: 'newRole',
+    message: 'What is their new role?',
+    choices: currentRoles
+   }
+];
+
+inquirer.prompt(questions)
+.then ((answers) => {
+
+  const updatedEmployee = answers.whichEmployee.match(/(\d+)/);
+  const updatedRole = answers.newRole.match(/(\d+)/);
+  const sql = `UPDATE employees
+  SET role_id = ${updatedRole}
+  WHERE id = ${updatedEmployee};`
+
+  db.query(sql, (err, result) => {
+    if (err) {
+    console.log(err);
+    }
+  return console.log("Employee Role updated");
+  });
+
+});
+
+
+
+}
 
 mainMenu = async function () {
   return inquirer.prompt(mainMenuQuestion)
@@ -279,7 +340,7 @@ mainMenu = async function () {
 
     } else {
 
-      greeting = "Good evening";
+      return updateRole();
     }
   console.log(answers.startQuestion);
 })
