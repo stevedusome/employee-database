@@ -10,6 +10,9 @@ const Departments = require('./lib/Departments.js');
 const Roles = require('./lib/Roles.js');
 const Employees = require('./lib/Employees.js');
 
+let allEmployees = [];
+let allRoles = [];
+
 const mainMenuQuestion = [
   {type: 'list',
   name: 'startQuestion',
@@ -251,53 +254,31 @@ addEmployee = async function () {
 
 updateRole = async function () {
 
-let currentEmployees = [];
-let currentRoles = [];
-
-getList = function (){ db.execute(`SELECT * FROM employees`, (err, rows) => {
-      
-    for (let i = 0; i < rows.length; i++) {
-    let thisEmployee = `${rows[i].id}. ${rows[i].first_name} ${rows[i].last_name}`;
-    currentEmployees.push(thisEmployee);
-    return currentEmployees;
-    };
-  });
-
-  db.execute(`SELECT * FROM roles`, (err, rows) => {
-      
-    for (let i = 0; i < rows.length; i++) {
-    let thisRole = `${rows[i].id}. ${rows[i].title}`;
-    currentRoles.push(thisRole);
-    return currentRoles;
-    };
-  });};
-
-const promise = getList ();
-
  const questions = [{
     type: 'list',
     name: 'whichEmployee',
     message: 'Which employee is changing roles??',
-    choices: currentEmployees
+    choices: allEmployees
    },
    {
     type: 'list',
     name: 'newRole',
     message: 'What is their new role?',
-    choices: currentRoles
+    choices: allRoles
    }
 ];
 
-inquirer.prompt(questions)
+return inquirer.prompt(questions)
 .then ((answers) => {
 
   const updatedEmployee = answers.whichEmployee.match(/(\d+)/);
   const updatedRole = answers.newRole.match(/(\d+)/);
+  const params = [updatedRole[0], updatedEmployee[0]]
   const sql = `UPDATE employees
-  SET role_id = ${updatedRole}
-  WHERE id = ${updatedEmployee};`
+  SET role_id = ?
+  WHERE id = ?`
 
-  db.query(sql, (err, result) => {
+  db.query(sql, params, (err, result) => {
     if (err) {
     console.log(err);
     }
@@ -311,6 +292,21 @@ inquirer.prompt(questions)
 }
 
 mainMenu = async function () {
+  db.execute(`SELECT * FROM employees`, (err, rows) => {
+      
+    for (let i = 0; i < rows.length; i++) {
+    let thisEmployee = `${rows[i].id}. ${rows[i].first_name} ${rows[i].last_name}`;
+    allEmployees.push(thisEmployee);
+    };
+  });
+
+  db.execute(`SELECT * FROM roles`, (err, rows) => {
+      
+    for (let i = 0; i < rows.length; i++) {
+    let thisRole = `${rows[i].id}. ${rows[i].title}`;
+    allRoles.push(thisRole);
+    };
+  });;
   return inquirer.prompt(mainMenuQuestion)
   .then ((answers) => {
 
