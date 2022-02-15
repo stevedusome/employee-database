@@ -274,10 +274,13 @@ return inquirer.prompt(questions)
 
 mainMenu = async function () {
   db.execute(`SELECT * FROM employees`, (err, rows) => {
-      
+       
     for (let i = 0; i < rows.length; i++) {
     let thisEmployee = `${rows[i].id}. ${rows[i].first_name} ${rows[i].last_name}`;
     allEmployees.push(thisEmployee);
+    if (!allEmployees.includes(thisEmployee)) {
+      allEmployees.push(thisEmployee);
+    }
     };
   });
 
@@ -285,8 +288,9 @@ mainMenu = async function () {
       
     for (let i = 0; i < rows.length; i++) {
     let thisRole = `${rows[i].id}. ${rows[i].title}`;
-    allRoles.push(thisRole);
-    };
+    if (!allRoles.includes(thisRole)) {
+      allRoles.push(thisRole);
+    }};
   });;
   return inquirer.prompt(mainMenuQuestion)
   .then ((answers) => {
