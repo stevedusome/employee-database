@@ -1,3 +1,4 @@
+TRUNCATE TABLE departments;
 INSERT INTO departments (department_name)
 VALUES
   ('Management'),
@@ -6,6 +7,7 @@ VALUES
   ('HR'),
   ('Temp Employees');
 
+TRUNCATE TABLE roles;
   INSERT INTO roles (title, salary, department_id)
 VALUES
   ('CEO', 500000, 1),
@@ -18,6 +20,7 @@ VALUES
   ('HR Admin', 60000, 4),
   ('Temp', 35000, 5);
 
+TRUNCATE TABLE employees;
   INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
   ('Ronald', 'Firbank', 1, NULL),

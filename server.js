@@ -166,27 +166,8 @@ addRole = async function () {
 };
 
 addEmployee = async function () {
-  let currentRoles = []
-  let currentEmployees = []
 
-  db.query(`SELECT * FROM employees`, (err, rows) => {
-    
-    for (let i = 0; i < rows.length; i++) {
-    let thisEmployee = `${rows[i].id}. ${rows[i].first_name} ${rows[i].last_name}`;
-    currentEmployees.push(thisEmployee);
-    };
-    currentEmployees.push('None')
-
-  });
-
-  db.query(`SELECT * FROM roles`, (err, rows) => {
-    
-    for (let i = 0; i < rows.length; i++) {
-    let thisRole = `${rows[i].id}. ${rows[i].title}`;
-    currentRoles.push(thisRole);
-    };
-
-  });
+  allEmployees.push('None')
 
   const questions = [
     {
@@ -219,17 +200,17 @@ addEmployee = async function () {
       type: 'list',
       name: 'employeeRole',
       message: 'What is the employees role?',
-      choices: currentRoles
+      choices: allRoles
      },
      {
       type: 'list',
       name: 'employeeManager',
       message: 'Who is the employees manager?',
-      choices: currentEmployees
+      choices: allEmployees
      }
   ];    
 
-  inquirer.prompt(questions)
+  return inquirer.prompt(questions)
     .then((answers) => {
       let managerNumber
       if (answers.employeeManager === 'None') {
